@@ -1,14 +1,62 @@
 // 微信canvas绘图工具类
-const textBreakline = Symbol('textBreakline')
+const textBreakline = Symbol('textBreakline');
+const validateRlues = Symbol('validateRlues');
+const letterSpacingText = Symbol('letterSpacingText');
 
-export class CanvasTool {
+export default class CanvasTool {
     constructor(ctx, scale) {
         this.ctx = ctx;
         this.scale = scale || 1;
     }
 
     /**
-     * textTool 绘制文本的方法 
+     * rect 绘制矩形的方法
+     * @param { Object } rectObj 传入的矩形对象
+     * x 页面x轴的坐标
+     * y 页面y轴的坐标
+     * width 矩形的宽度
+     * height 矩形的高度
+     * bgColor 矩形的背景色
+     * fill 是否填充
+     * strokeStyle 填充边框的颜色
+     * stroke 是否需要边框
+     */
+    rect(rectObj) {
+        // 获取传入的文本对象
+        let { x, y, width, height, bgColor, fill, stroke, strokeStyle } = rectObj;
+        // 参数校验规则
+        let ruleMap = new Map([
+            [x, { type: 'number', param: 'x' }],
+            [y, { type: 'number', param: 'y' }],
+            [width, { type: 'number', param: 'width' }],
+            [height, { type: 'number', param: 'height' }],
+            [bgColor, { type: 'string', param: 'bgColor' }]
+        ]);
+        this[validateRlues](ruleMap);
+
+        // 设置默认值
+        x = x || 0;
+        y = y || 0;
+        bgColor = bgColor || '#fff';
+        fill = fill || false;
+
+        this.ctx.rect(x, y, width, height);
+        this.ctx.setFillStyle(bgColor);
+        fill && this.ctx.fill();
+        stroke && this.ctx.setStrokeStyle(strokeStyle);
+        stroke && this.ctx.stroke();
+    }
+
+    /**
+     * arc 绘制圆形的方法
+     * @param { Object } arcObj 传入的圆形对象
+     */
+    arc(arcObj) {
+        // let {}
+    }
+
+    /**
+     * text 绘制文本的方法 
      * text 文本
      * x 页面x轴坐标
      * y 页面y轴坐标
@@ -17,27 +65,26 @@ export class CanvasTool {
      * fontSize 字号
      * align 对其方式
      * textBaseline 文本的基线
+     * wrap 是否换行
+     * lineHeight 行高
+     * letterSpacing 字间距
      */
-    textTool(textObj) {
+    text(textObj) {
         // 获取传入的文本对象
-        let { text, color, fontSize, align, x, y, width, textBaseline } = textObj;
+        let { text, color, fontSize, align, x, y, width, textBaseline, wrap, lineHeight, letterSpacing } = textObj;
         // 参数校验规则
         let ruleMap = new Map([
-            [text, 'String'],
-            [color, 'String'],
-            [textBaseline, 'String']
-            [align, 'String'],
-            [fontSize, 'Number'],
-            [x, 'Number'],
-            [y, 'Number'],
-            [width, 'Number'],
+            [text, { type: 'string', param: 'text' }],
+            [color, { type: 'string', param: 'color' }],
+            [textBaseline, { type: 'string', param: 'textBaseline' }],
+            [align, { type: 'string', param: 'align' }],
+            [fontSize, { type: 'number', param: 'fontSize' }],
+            [x, { type: 'number', param: 'x' }],
+            [y, { type: 'number', param: 'y' }],
+            [width, { type: 'number', param: 'width' }],
         ]);
-        for (let [key, val] in ruleMap.entries()) {
-            if (key && typeof key != val) {
-                throw new Error(key + '参数错误,要求是' + val);
-                break;
-            }
-        }
+        this[validateRlues](ruleMap);
+
         // 设置默认值
         color = color || '';
         fontSize = fontSize || 16;
@@ -45,16 +92,111 @@ export class CanvasTool {
         x = x || 0;
         y = y || 0;
         width = width || 0;
+        wrap = wrap || false; // 默认不换行
+        letterSpacing = letterSpacing || 0;
+
         // 绘图
         this.ctx.setFillStyle(color);
         this.ctx.setFontSize(fontSize * this.scale);
         this.ctx.setTextAlign(align);
-        this.ctx.fillText(text, x, y, width);
         textBaseline && this.ctx.setTextBaseline(textBaseline);
+        !wrap && !letterSpacing && this.ctx.fillText(text, x, y, width);
+        wrap && this[textBreakline](text, x, y, width, lineHeight);
+        letterSpacing && this[letterSpacingText](text, align, x, y, letterSpacing);
     }
 
-    // 文本换行功能
-    [textBreakline]() {
-
+    // 绘制
+    darw() {
+        this.ctx.darw();
     }
-};
+
+    // -------私有属性--------
+
+    /**
+     * textBreakline 文本换行功能,支持行高
+     * @param {String} text 文本
+     * @param {Number} x 页面x轴的位置
+     * @param {Number} y 页面y轴的位置
+     * @param {Number} maxWidth 最大宽度
+     * @param {Number} lineHeight 行高
+     */
+    [textBreakline](text, x, y, maxWidth, lineHeight) {
+        // 字符分隔为数组
+        let arrText = text.split('');
+        let line = '';
+
+        for (let n = 0; n < arrText.length; n++) {
+            let testLine = line + arrText[n];
+            let metrics = this.ctx.measureText(testLine);
+            let testWidth = metrics.width;
+            if (testWidth > maxWidth && n > 0) {
+                this.ctx.fillText(line, x, y);
+                line = arrText[n];
+                y += lineHeight;
+            } else {
+                line = testLine;
+            }
+        }
+        this.ctx.fillText(line, x, y);
+    }
+
+    /**
+     * 文本支持字间距
+     * @param {String} text 文本
+     * @param {Number} x 页面x轴的位置
+     * @param {Number} y 页面y轴的位置
+     * @param {Number} letterSpacing 字间距
+     */
+    [letterSpacingText](text, textAlign, x, y, letterSpacing) {
+        let context = this.ctx;
+
+        // let canvas = context.canvas;
+        // if (!letterSpacing && canvas) {
+        //     letterSpacing = parseFloat(window.getComputedStyle(canvas).letterSpacing);
+        // }
+        // if (!letterSpacing) {
+        //     return this.fillText(text, x, y);
+        // }
+
+        let arrText = text.split('');
+        let align = textAlign || 'left';
+
+        // 这里仅考水平排列
+        let originWidth = context.measureText(text).width;
+        // 应用letterSpacing占据宽度
+        let actualWidth = originWidth + letterSpacing * (arrText.length - 1);
+        // 根据水平对齐方式确定第一个字符的坐标
+        if (align == 'center') {
+            x = x - actualWidth / 2;
+        } else if (align == 'right') {
+            x = x - actualWidth;
+        }
+
+        // 临时修改为文本左对齐
+        context.setTextAlign('left');
+        // 开始逐字绘制
+        arrText.forEach(function(letter) {
+            let letterWidth = context.measureText(letter).width;
+            context.fillText(letter, x, y);
+            // 确定下一个字符的横坐标
+            x = x + letterWidth + letterSpacing;
+        });
+        // 对齐方式还原
+        context.setTextAlign(align);
+    }
+
+    // 校验功能
+    [validateRlues](ruleMap) {
+        try {
+            for (let [key, val] of ruleMap.entries()) {
+                if (key && typeof key != val.type) {
+                    throw new Error(val.param + '的参数类型错误,要求是' + val.type + '类型');
+                    // 把所有参数都校验一遍
+                    continue;
+                }
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    }
+}
