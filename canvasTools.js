@@ -30,7 +30,10 @@ export default class CanvasTool {
             [y, { type: 'number', param: 'y' }],
             [width, { type: 'number', param: 'width' }],
             [height, { type: 'number', param: 'height' }],
-            [bgColor, { type: 'string', param: 'bgColor' }]
+            [bgColor, { type: 'string', param: 'bgColor' }],
+            [strokeStyle, { type: 'string', param: 'strokeStyle' }],
+            [stroke, { type: 'boolean', param: 'stroke' }],
+            [fill, { type: 'boolean', param: 'fill' }]
         ]);
         this[validateRlues](ruleMap);
 
@@ -38,21 +41,79 @@ export default class CanvasTool {
         x = x || 0;
         y = y || 0;
         bgColor = bgColor || '#fff';
+        strokeStyle = strokeStyle || '#000';
         fill = fill || false;
 
         this.ctx.rect(x, y, width, height);
-        this.ctx.setFillStyle(bgColor);
-        fill && this.ctx.fill();
-        stroke && this.ctx.setStrokeStyle(strokeStyle);
-        stroke && this.ctx.stroke();
+        fill && (
+            this.ctx.setFillStyle(bgColor),
+            this.ctx.fill()
+        );
+        stroke && (
+            this.ctx.setStrokeStyle(strokeStyle),
+            this.ctx.stroke()
+        );
+    }
+
+    /**
+     * square 绘制正方形的方法
+     * @param { Object } squareObj 传入的圆形对象
+     * 参数同矩形的参数一致,只需要传入width就可以了
+     */
+    square(squareObj) {
+        squareObj.height = squareObj.width;
+        this.rect(squareObj);
     }
 
     /**
      * arc 绘制圆形的方法
      * @param { Object } arcObj 传入的圆形对象
+     * x 圆心的x轴
+     * y 圆心的y轴
+     * r 半径
+     * sAngle 开始弧度
+     * eAngle 终止弧度
+     * counterclockwise 弧度方向是否是逆时针
+     * fill 是否填充
+     * storke 是有边框
+     * bgColor 背景色
+     * strokeStyle 边框色
      */
     arc(arcObj) {
-        // let {}
+        let { x, y, r, sAngle, eAngle, counterclockwise, fill, bgColor, strokeStyle, storke } = arcObj;
+        // 参数校验规则
+        let ruleMap = new Map([
+            [x, { type: 'number', param: 'x' }],
+            [y, { type: 'number', param: 'y' }],
+            [r, { type: 'number', param: 'r' }],
+            [sAngle, { type: 'number', param: 'sAngle' }],
+            [eAngle, { type: 'number', param: 'eAngle' }],
+            [counterclockwise, { type: 'number', param: 'counterclockwise' }],
+            [fill, { type: 'boolean', param: 'fill' }],
+            [storke, { type: 'boolean', param: 'storke' }],
+            [bgColor, { type: 'string', params: 'bgColor' }],
+            [strokeStyle, { type: 'string', params: 'strokeStyle' }],
+        ]);
+        this[validateRlues](ruleMap);
+
+        // 设置默认值
+        x = x || 0;
+        y = y || 0;
+        sAngle = sAngle || 0;
+        eAngle = eAngle || 0;
+        fill = fill || false;
+        bgColor = bgColor || '#000';
+
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, r, sAngle * Math.PI, eAngle * Math.PI, counterclockwise);
+        storke && (
+            this.ctx.setStrokeStyle(strokeStyle),
+            this.ctx.stroke()
+        );
+        fill && (
+            this.ctx.setFillStyle(bgColor),
+            this.ctx.fill()
+        );
     }
 
     /**
@@ -82,6 +143,9 @@ export default class CanvasTool {
             [x, { type: 'number', param: 'x' }],
             [y, { type: 'number', param: 'y' }],
             [width, { type: 'number', param: 'width' }],
+            [lineHeight, { type: 'number', param: 'lineHeight' }],
+            [letterSpacing, { type: 'number', param: 'letterSpacing' }],
+            [wrap, { type: 'boolean', param: 'wrap' }],
         ]);
         this[validateRlues](ruleMap);
 
@@ -111,7 +175,6 @@ export default class CanvasTool {
     }
 
     // -------私有属性--------
-
     /**
      * textBreakline 文本换行功能,支持行高
      * @param {String} text 文本
