@@ -16,7 +16,7 @@
 Browser:
 
 ```html
-<script src='canvasTools.js'></script>
+<script src='./canvasTools.js'></script>
 ```
 
 [Node.js](http://nodejs.org):
@@ -26,13 +26,13 @@ $ npm install canvasTools.js
 ```
 
 ```javascript
-const Big = require('canvasTools.js');
+const CanvasTools= require('canvasTools.js');
 ```
 
 ES6 module:
 
 ```javascript
-import Big from './canvasTools.mjs';
+import CanvasTools from './canvasTools.mjs';
 ```
 ## Use
 
