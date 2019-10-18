@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <canvas width=500 height=500 id="canvas"></canvas>
+    <script src="./canvasTools.js"></script>
+    <script>
+        console.log(window);
+        // 获取绘图的上下文
+        let ctx = document.querySelector("#canvas").getContext('2d');
+
+        // 绘制矩形
+        let canvasInstance = new CanvasTool(ctx);
+        canvasInstance.arc({
+            x: 100,
+            y: 100,
+            r: 50,
+            sAngle: 90,
+            eAngle: 270,
+            counterclockwise: false,
+            fill: true,
+            bgColor: 'red',
+            strokeStyle: 'yellow',
+            strokeWidth: 4,
+            storke: true
+        });
+    </script>
+</body>
+
+</html>

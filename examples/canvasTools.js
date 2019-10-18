@@ -17,6 +17,9 @@
     const textBreakline = Symbol('textBreakline');
     const validateRlues = Symbol('validateRlues');
     const letterSpacingText = Symbol('letterSpacingText');
+    const setFillStyle = Symbol('setFillStyle');
+    const setStrokeStyle = Symbol('setStrokeStyle');
+    const setFontSize = Symbol("setFontSize");
 
     class CanvasTool {
         constructor(ctx, scale) {
@@ -38,13 +41,14 @@
          */
         rect(rectObj) {
             // 获取传入的文本对象
-            let { x, y, width, height, bgColor, fill, stroke, strokeStyle } = rectObj;
+            let { x, y, width, height, bgColor, fill, stroke, strokeStyle, strokeWidth } = rectObj;
             // 参数校验规则
             let ruleMap = new Map([
                 [x, { type: 'number', param: 'x' }],
                 [y, { type: 'number', param: 'y' }],
                 [width, { type: 'number', param: 'width' }],
                 [height, { type: 'number', param: 'height' }],
+                [strokeWidth, { type: 'number', param: 'strokeWidth' }],
                 [bgColor, { type: 'string', param: 'bgColor' }],
                 [strokeStyle, { type: 'string', param: 'strokeStyle' }],
                 [stroke, { type: 'boolean', param: 'stroke' }],
@@ -58,15 +62,16 @@
             bgColor = bgColor || '#fff';
             strokeStyle = strokeStyle || '#000';
             fill = fill || false;
+            strokeWidth = strokeWidth || 1;
 
             this.ctx.rect(x, y, width, height);
             fill && (
-                this.ctx.setFillStyle(bgColor),
+                this[setFillStyle](bgColor),
                 this.ctx.fill()
             );
             stroke && (
-                this.ctx.setStrokeStyle(strokeStyle),
-                this.ctx.stroke()
+                this[setStrokeStyle](strokeWidth, strokeStyle),
+                this.ctx.strokeRect(x, y, width + strokeWidth, height + strokeWidth)
             );
         }
 
@@ -95,7 +100,7 @@
          * strokeStyle 边框色
          */
         arc(arcObj) {
-            let { x, y, r, sAngle, eAngle, counterclockwise, fill, bgColor, strokeStyle, storke } = arcObj;
+            let { x, y, r, sAngle, eAngle, counterclockwise, fill, bgColor, strokeStyle, strokeWidth, storke } = arcObj;
             // 参数校验规则
             let ruleMap = new Map([
                 [x, { type: 'number', param: 'x' }],
@@ -103,6 +108,7 @@
                 [r, { type: 'number', param: 'r' }],
                 [sAngle, { type: 'number', param: 'sAngle' }],
                 [eAngle, { type: 'number', param: 'eAngle' }],
+                [strokeWidth, { type: 'number', param: 'strokeWidth' }],
                 [counterclockwise, { type: 'number', param: 'counterclockwise' }],
                 [fill, { type: 'boolean', param: 'fill' }],
                 [storke, { type: 'boolean', param: 'storke' }],
@@ -121,12 +127,13 @@
 
             this.ctx.beginPath();
             this.ctx.arc(x, y, r, sAngle * Math.PI, eAngle * Math.PI, counterclockwise);
+            // 圆的边框暂时不生效
             storke && (
-                this.ctx.setStrokeStyle(strokeStyle),
+                this[setStrokeStyle](strokeWidth, strokeStyle),
                 this.ctx.stroke()
             );
             fill && (
-                this.ctx.setFillStyle(bgColor),
+                this[setFillStyle](bgColor),
                 this.ctx.fill()
             );
         }
@@ -147,13 +154,14 @@
          */
         text(textObj) {
             // 获取传入的文本对象
-            let { text, color, fontSize, align, x, y, width, textBaseline, wrap, lineHeight, letterSpacing } = textObj;
+            let { text, color, fontSize, fontStyle, align, x, y, width, textBaseline, wrap, lineHeight, letterSpacing } = textObj;
             // 参数校验规则
             let ruleMap = new Map([
                 [text, { type: 'string', param: 'text' }],
                 [color, { type: 'string', param: 'color' }],
                 [textBaseline, { type: 'string', param: 'textBaseline' }],
                 [align, { type: 'string', param: 'align' }],
+                [fontStyle, { type: 'string', param: 'fontStyle' }],
                 [fontSize, { type: 'number', param: 'fontSize' }],
                 [x, { type: 'number', param: 'x' }],
                 [y, { type: 'number', param: 'y' }],
@@ -175,21 +183,39 @@
             letterSpacing = letterSpacing || 0;
 
             // 绘图
-            this.ctx.setFillStyle(color);
-            this.ctx.setFontSize(fontSize * this.scale);
-            this.ctx.setTextAlign(align);
-            textBaseline && this.ctx.setTextBaseline(textBaseline);
+            this[setFillStyle](color);
+            this[setFontSize](fontSize * this.scale);
+            this.ctx.textAlign = align;
+            textBaseline && (this.ctx.setTextBaseline = textBaseline);
             !wrap && !letterSpacing && this.ctx.fillText(text, x, y, width);
             wrap && this[textBreakline](text, x, y, width, lineHeight);
             letterSpacing && this[letterSpacingText](text, align, x, y, letterSpacing);
         }
 
-        // 绘制
-        darw() {
-            this.ctx.darw();
+        // -------私有属性--------
+        /**
+         * 设置填充颜色
+         */
+        [setFillStyle](fillStyle) {
+            this.ctx.fillStyle = fillStyle;
         }
 
-        // -------私有属性--------
+        /**
+         * 设置边框颜色
+         */
+        [setStrokeStyle](strokeWidth, strokeStyle) {
+            this.lineWidth = strokeWidth;
+            this.ctx.strokeStyle = strokeStyle;
+        }
+
+        /**
+         * 
+         */
+        [setFontSize](fontSize, fontStyle = "Microsoft YaHei") {
+            console.log(fontSize, fontStyle);
+            this.ctx.font = `${fontSize}px ${fontStyle}`;
+        }
+
         /**
          * textBreakline 文本换行功能,支持行高
          * @param {String} text 文本
@@ -251,7 +277,7 @@
             }
 
             // 临时修改为文本左对齐
-            context.setTextAlign('left');
+            context.textAlign = 'left';
             // 开始逐字绘制
             arrText.forEach(function(letter) {
                 let letterWidth = context.measureText(letter).width;
@@ -260,7 +286,7 @@
                 x = x + letterWidth + letterSpacing;
             });
             // 对齐方式还原
-            context.setTextAlign(align);
+            context.textAlign = align;
         }
 
         // 校验功能

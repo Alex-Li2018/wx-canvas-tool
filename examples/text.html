@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <canvas width=1000 height=500 id="canvas"></canvas>
+    <script src="./canvasTools.js"></script>
+    <script>
+        console.log(window);
+        // 获取绘图的上下文
+        let ctx = document.querySelector("#canvas").getContext('2d');
+
+        // 绘制矩形
+        let canvasInstance = new CanvasTool(ctx);
+        canvasInstance.text({
+            text: "测试文本内容",
+            color: 'red',
+            fontSize: 20,
+            align: 'center',
+            x: 100,
+            y: 100,
+            width: 300,
+            // textBaseline: ,
+            wrap: true,
+            lineHeight: 30,
+            // letterSpacing: 
+        });
+    </script>
+</body>
+
+</html>
