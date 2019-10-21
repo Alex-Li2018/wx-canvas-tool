@@ -1,4 +1,4 @@
-// 微信canvas绘图工具类
+// 普通canvas绘图工具类
 
 // umd适配多种引入方式
 (function(root, factory) {
@@ -25,6 +25,92 @@
         constructor(ctx, scale) {
             this.ctx = ctx;
             this.scale = scale || 1;
+        }
+
+        /**
+         * 画直线
+         * @param { Object } lineObj 传入的直线对象
+         * line 画直线
+         * sx: 开始x轴
+         * sy: 开始y轴
+         * ex: 结束x轴
+         * ey: 结束y轴
+         * strokeWidth: 线宽
+         * strokeStyle: 线条样式
+         */
+        line(lineObj) {
+            // 获取传入的文本对象
+            let { sx, sy, ex, ey, strokeWidth, strokeStyle } = lineObj;
+            // 参数校验规则
+            let ruleMap = new Map([
+                [sx, { type: 'number', param: 'sx' }],
+                [sy, { type: 'number', param: 'sy' }],
+                [ex, { type: 'number', param: 'ex' }],
+                [ey, { type: 'number', param: 'ey' }],
+                [strokeWidth, { type: 'number', param: 'strokeWidth' }],
+                [strokeStyle, { type: 'string', param: 'strokeStyle' }]
+            ]);
+            this[validateRlues](ruleMap);
+
+            // 设置默认值
+            sx = sx || 0;
+            sy = sy || 0;
+            ex = ex || 100;
+            ey = ey || 100;
+            strokeStyle = strokeStyle || '#000';
+            strokeWidth = strokeWidth || 2;
+
+            this.ctx.beginPath();
+            this.ctx.moveTo(sx, sy);
+            this.ctx.lineTo(ex, ey);
+            this[setStrokeStyle](strokeWidth, strokeStyle);
+            this.ctx.stroke();
+        }
+
+        /**
+         * 画三角形
+         * @param { Object } triangleObj 传入的三角形对象
+         */
+        triangle(triangleObj) {
+            // 获取传入的三角形对象
+            let { fx, fy, sx, sy, tx, ty, stroke, strokeWidth, strokeStyle, fill, bgColor } = triangleObj;
+
+            // 参数校验规则
+            let ruleMap = new Map([
+                [fx, { type: 'number', param: 'fx' }],
+                [fy, { type: 'number', param: 'fy' }],
+                [sx, { type: 'number', param: 'sx' }],
+                [sy, { type: 'number', param: 'sy' }],
+                [tx, { type: 'number', param: 'tx' }],
+                [ty, { type: 'number', param: 'ty' }],
+                [strokeWidth, { type: 'number', param: 'strokeWidth' }],
+                [bgColor, { type: 'string', param: 'bgColor' }],
+                [strokeStyle, { type: 'string', param: 'strokeStyle' }],
+                [stroke, { type: 'boolean', param: 'stroke' }],
+                [fill, { type: 'boolean', param: 'fill' }]
+            ]);
+            this[validateRlues](ruleMap);
+
+            // 设置默认值
+            fx = fx || 0;
+            fy = fy || 0;
+            bgColor = bgColor || '#fff';
+            strokeStyle = strokeStyle || '#000';
+            fill = fill || false;
+            strokeWidth = strokeWidth || 1;
+            this.ctx.beginPath();
+            this.ctx.moveTo(fx, fy);
+            this.ctx.lineTo(sx, sy);
+            this.ctx.lineTo(tx, ty);
+            // 填充颜色
+            fill && (
+                this[setFillStyle](bgColor),
+                this.ctx.fill()
+            );
+            stroke && (
+                this[setStrokeStyle](strokeWidth, strokeStyle),
+                this.ctx.stroke()
+            );
         }
 
         /**
@@ -204,7 +290,7 @@
          * 设置边框颜色
          */
         [setStrokeStyle](strokeWidth, strokeStyle) {
-            this.lineWidth = strokeWidth;
+            this.ctx.lineWidth = strokeWidth;
             this.ctx.strokeStyle = strokeStyle;
         }
 

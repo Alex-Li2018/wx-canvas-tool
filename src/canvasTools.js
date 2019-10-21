@@ -1,4 +1,4 @@
-// 微信canvas绘图工具类
+// 普通canvas绘图工具类
 
 // umd适配多种引入方式
 (function(root, factory) {
@@ -12,16 +12,105 @@
         // 浏览器全局变量(root 即 window)
         root.CanvasTool = factory();
     }
-}(this, function() {
+}(window, function() {
     // 方法
     const textBreakline = Symbol('textBreakline');
     const validateRlues = Symbol('validateRlues');
     const letterSpacingText = Symbol('letterSpacingText');
+    const setFillStyle = Symbol('setFillStyle');
+    const setStrokeStyle = Symbol('setStrokeStyle');
+    const setFontSize = Symbol("setFontSize");
 
     class CanvasTool {
         constructor(ctx, scale) {
             this.ctx = ctx;
             this.scale = scale || 1;
+        }
+
+        /**
+         * 画直线
+         * @param { Object } lineObj 传入的直线对象
+         * line 画直线
+         * sx: 开始x轴
+         * sy: 开始y轴
+         * ex: 结束x轴
+         * ey: 结束y轴
+         * strokeWidth: 线宽
+         * strokeStyle: 线条样式
+         */
+        line(lineObj) {
+            // 获取传入的文本对象
+            let { sx, sy, ex, ey, strokeWidth, strokeStyle } = lineObj;
+            // 参数校验规则
+            let ruleMap = new Map([
+                [sx, { type: 'number', param: 'sx' }],
+                [sy, { type: 'number', param: 'sy' }],
+                [ex, { type: 'number', param: 'ex' }],
+                [ey, { type: 'number', param: 'ey' }],
+                [strokeWidth, { type: 'number', param: 'strokeWidth' }],
+                [strokeStyle, { type: 'string', param: 'strokeStyle' }]
+            ]);
+            this[validateRlues](ruleMap);
+
+            // 设置默认值
+            sx = sx || 0;
+            sy = sy || 0;
+            ex = ex || 100;
+            ey = ey || 100;
+            strokeStyle = strokeStyle || '#000';
+            strokeWidth = strokeWidth || 2;
+
+            this.ctx.beginPath();
+            this.ctx.moveTo(sx, sy);
+            this.ctx.lineTo(ex, ey);
+            this[setStrokeStyle](strokeWidth, strokeStyle);
+            this.ctx.stroke();
+        }
+
+        /**
+         * 画三角形
+         * @param { Object } triangleObj 传入的三角形对象
+         */
+        triangle(triangleObj) {
+            // 获取传入的三角形对象
+            let { fx, fy, sx, sy, tx, ty, stroke, strokeWidth, strokeStyle, fill, bgColor } = triangleObj;
+
+            // 参数校验规则
+            let ruleMap = new Map([
+                [fx, { type: 'number', param: 'fx' }],
+                [fy, { type: 'number', param: 'fy' }],
+                [sx, { type: 'number', param: 'sx' }],
+                [sy, { type: 'number', param: 'sy' }],
+                [tx, { type: 'number', param: 'tx' }],
+                [ty, { type: 'number', param: 'ty' }],
+                [strokeWidth, { type: 'number', param: 'strokeWidth' }],
+                [bgColor, { type: 'string', param: 'bgColor' }],
+                [strokeStyle, { type: 'string', param: 'strokeStyle' }],
+                [stroke, { type: 'boolean', param: 'stroke' }],
+                [fill, { type: 'boolean', param: 'fill' }]
+            ]);
+            this[validateRlues](ruleMap);
+
+            // 设置默认值
+            fx = fx || 0;
+            fy = fy || 0;
+            bgColor = bgColor || '#fff';
+            strokeStyle = strokeStyle || '#000';
+            fill = fill || false;
+            strokeWidth = strokeWidth || 1;
+            this.ctx.beginPath();
+            this.ctx.moveTo(fx, fy);
+            this.ctx.lineTo(sx, sy);
+            this.ctx.lineTo(tx, ty);
+            // 填充颜色
+            fill && (
+                this[setFillStyle](bgColor),
+                this.ctx.fill()
+            );
+            stroke && (
+                this[setStrokeStyle](strokeWidth, strokeStyle),
+                this.ctx.stroke()
+            );
         }
 
         /**
@@ -38,13 +127,14 @@
          */
         rect(rectObj) {
             // 获取传入的文本对象
-            let { x, y, width, height, bgColor, fill, stroke, strokeStyle } = rectObj;
+            let { x, y, width, height, bgColor, fill, stroke, strokeStyle, strokeWidth } = rectObj;
             // 参数校验规则
             let ruleMap = new Map([
                 [x, { type: 'number', param: 'x' }],
                 [y, { type: 'number', param: 'y' }],
                 [width, { type: 'number', param: 'width' }],
                 [height, { type: 'number', param: 'height' }],
+                [strokeWidth, { type: 'number', param: 'strokeWidth' }],
                 [bgColor, { type: 'string', param: 'bgColor' }],
                 [strokeStyle, { type: 'string', param: 'strokeStyle' }],
                 [stroke, { type: 'boolean', param: 'stroke' }],
@@ -58,15 +148,16 @@
             bgColor = bgColor || '#fff';
             strokeStyle = strokeStyle || '#000';
             fill = fill || false;
+            strokeWidth = strokeWidth || 1;
 
             this.ctx.rect(x, y, width, height);
             fill && (
-                this.ctx.setFillStyle(bgColor),
+                this[setFillStyle](bgColor),
                 this.ctx.fill()
             );
             stroke && (
-                this.ctx.setStrokeStyle(strokeStyle),
-                this.ctx.stroke()
+                this[setStrokeStyle](strokeWidth, strokeStyle),
+                this.ctx.strokeRect(x, y, width + strokeWidth, height + strokeWidth)
             );
         }
 
@@ -95,7 +186,7 @@
          * strokeStyle 边框色
          */
         arc(arcObj) {
-            let { x, y, r, sAngle, eAngle, counterclockwise, fill, bgColor, strokeStyle, storke } = arcObj;
+            let { x, y, r, sAngle, eAngle, counterclockwise, fill, bgColor, strokeStyle, strokeWidth, storke } = arcObj;
             // 参数校验规则
             let ruleMap = new Map([
                 [x, { type: 'number', param: 'x' }],
@@ -103,6 +194,7 @@
                 [r, { type: 'number', param: 'r' }],
                 [sAngle, { type: 'number', param: 'sAngle' }],
                 [eAngle, { type: 'number', param: 'eAngle' }],
+                [strokeWidth, { type: 'number', param: 'strokeWidth' }],
                 [counterclockwise, { type: 'number', param: 'counterclockwise' }],
                 [fill, { type: 'boolean', param: 'fill' }],
                 [storke, { type: 'boolean', param: 'storke' }],
@@ -121,12 +213,13 @@
 
             this.ctx.beginPath();
             this.ctx.arc(x, y, r, sAngle * Math.PI, eAngle * Math.PI, counterclockwise);
+            // 圆的边框暂时不生效
             storke && (
-                this.ctx.setStrokeStyle(strokeStyle),
+                this[setStrokeStyle](strokeWidth, strokeStyle),
                 this.ctx.stroke()
             );
             fill && (
-                this.ctx.setFillStyle(bgColor),
+                this[setFillStyle](bgColor),
                 this.ctx.fill()
             );
         }
@@ -147,13 +240,14 @@
          */
         text(textObj) {
             // 获取传入的文本对象
-            let { text, color, fontSize, align, x, y, width, textBaseline, wrap, lineHeight, letterSpacing } = textObj;
+            let { text, color, fontSize, fontStyle, align, x, y, width, textBaseline, wrap, lineHeight, letterSpacing } = textObj;
             // 参数校验规则
             let ruleMap = new Map([
                 [text, { type: 'string', param: 'text' }],
                 [color, { type: 'string', param: 'color' }],
                 [textBaseline, { type: 'string', param: 'textBaseline' }],
                 [align, { type: 'string', param: 'align' }],
+                [fontStyle, { type: 'string', param: 'fontStyle' }],
                 [fontSize, { type: 'number', param: 'fontSize' }],
                 [x, { type: 'number', param: 'x' }],
                 [y, { type: 'number', param: 'y' }],
@@ -175,21 +269,39 @@
             letterSpacing = letterSpacing || 0;
 
             // 绘图
-            this.ctx.setFillStyle(color);
-            this.ctx.setFontSize(fontSize * this.scale);
-            this.ctx.setTextAlign(align);
-            textBaseline && this.ctx.setTextBaseline(textBaseline);
+            this[setFillStyle](color);
+            this[setFontSize](fontSize * this.scale);
+            this.ctx.textAlign = align;
+            textBaseline && (this.ctx.setTextBaseline = textBaseline);
             !wrap && !letterSpacing && this.ctx.fillText(text, x, y, width);
             wrap && this[textBreakline](text, x, y, width, lineHeight);
             letterSpacing && this[letterSpacingText](text, align, x, y, letterSpacing);
         }
 
-        // 绘制
-        darw() {
-            this.ctx.darw();
+        // -------私有属性--------
+        /**
+         * 设置填充颜色
+         */
+        [setFillStyle](fillStyle) {
+            this.ctx.fillStyle = fillStyle;
         }
 
-        // -------私有属性--------
+        /**
+         * 设置边框颜色
+         */
+        [setStrokeStyle](strokeWidth, strokeStyle) {
+            this.ctx.lineWidth = strokeWidth;
+            this.ctx.strokeStyle = strokeStyle;
+        }
+
+        /**
+         * 
+         */
+        [setFontSize](fontSize, fontStyle = "Microsoft YaHei") {
+            console.log(fontSize, fontStyle);
+            this.ctx.font = `${fontSize}px ${fontStyle}`;
+        }
+
         /**
          * textBreakline 文本换行功能,支持行高
          * @param {String} text 文本
@@ -251,7 +363,7 @@
             }
 
             // 临时修改为文本左对齐
-            context.setTextAlign('left');
+            context.textAlign = 'left';
             // 开始逐字绘制
             arrText.forEach(function(letter) {
                 let letterWidth = context.measureText(letter).width;
@@ -260,7 +372,7 @@
                 x = x + letterWidth + letterSpacing;
             });
             // 对齐方式还原
-            context.setTextAlign(align);
+            context.textAlign = align;
         }
 
         // 校验功能

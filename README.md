@@ -1,10 +1,10 @@
 # canvasTools.js
 
-**一个小型、快捷、封装化的canvas操作工具js.**
+**一个小型(7KB)、快捷、封装化的canvas操作工具js.**
 
 ## Features
 
-  - 矩形/正方形/圆/文本/文本换行/文本间隔
+  - 直线/三角形/矩形/正方形/圆/文本/文本换行/文本间隔
   - wx- 是操作微信小程序canvas
   - Simple API
   - No dependencies
@@ -41,7 +41,34 @@ import CanvasTools from './canvasTools.mjs';
 
     let canvasInstance = new CanvasTool(ctx) // 只传入canvas上下文作参数
 
-    let canvasInstance = new CanvasTool(ctx, 0.5) // 多传入一个缩放比例   
+    let canvasInstance = new CanvasTool(ctx, 0.5) // 多传入一个缩放比例 
+
+画一条直线的方法.
+
+    canvasInstance.line({
+        sx: 100,
+        sy: 100,
+        ex: 400,
+        ey: 400,
+        strokeStyle: 'red',
+        strokeWidth: 40
+    });
+
+画一个三角形的方法.
+
+    canvasInstance.triangle({
+        fx: 75,
+        fy: 50,
+        sx: 100,
+        sy: 75,
+        tx: 100,
+        ty: 25,
+        stroke: true,
+        strokeStyle: 'red',
+        strokeWidth: 4,
+        fill: true,
+        bgColor: '#000'
+    });
 
 画一个矩形/正方形的方法.
 
@@ -91,6 +118,12 @@ import CanvasTools from './canvasTools.mjs';
 更多的特性与API请查看源码.
 
 ## Test
+
+```bash
+$ npm install
+
+$ npm run gulp (可生成压缩后的测试文件)
+```
 
 直接打开examples中的例子即可.
 

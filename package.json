@@ -1,0 +1,37 @@
+{
+    "name": "wx-canvas-tool",
+    "version": "1.0.0",
+    "description": "**一个小型、快捷、封装化的canvas操作工具js.**",
+    "main": "canvasTools.js",
+    "directories": {
+        "example": "examples"
+    },
+    "scripts": {
+        "gulp": "gulp"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Alex-Li2018/wx-canvas-tool.git"
+    },
+    "keywords": [
+        "canvas-tool"
+    ],
+    "author": "李亚鹏",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/Alex-Li2018/wx-canvas-tool/issues"
+    },
+    "homepage": "https://github.com/Alex-Li2018/wx-canvas-tool#readme",
+    "devDependencies": {
+        "@babel/core": "^7.6.4",
+        "@babel/plugin-proposal-class-properties": "^7.5.5",
+        "@babel/preset-env": "^7.5.5",
+        "babel-loader": "^8.0.6",
+        "gulp": "^4.0.2",
+        "gulp-babel": "^8.0.0",
+        "gulp-clean": "^0.4.0",
+        "gulp-cli": "^2.2.0",
+        "gulp-rename": "^1.4.0",
+        "gulp-uglify": "^3.0.2"
+    }
+}

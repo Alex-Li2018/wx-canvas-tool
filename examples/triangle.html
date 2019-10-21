@@ -12,24 +12,23 @@
     <canvas width=500 height=500 id="canvas"></canvas>
     <script src="../dist/canvasTools.min.js"></script>
     <script>
-        console.log(window);
         // 获取绘图的上下文
         let ctx = document.querySelector("#canvas").getContext('2d');
 
         // 绘制矩形
         let canvasInstance = new CanvasTool(ctx);
-        canvasInstance.arc({
-            x: 100,
-            y: 100,
-            r: 50,
-            sAngle: 90,
-            eAngle: 270,
-            counterclockwise: false,
-            fill: true,
-            bgColor: 'red',
-            strokeStyle: 'yellow',
+        canvasInstance.triangle({
+            fx: 75,
+            fy: 50,
+            sx: 100,
+            sy: 75,
+            tx: 100,
+            ty: 25,
+            stroke: true,
+            strokeStyle: 'red',
             strokeWidth: 4,
-            storke: true
+            fill: true,
+            bgColor: '#000'
         });
     </script>
 </body>
