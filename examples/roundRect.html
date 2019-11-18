@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    <canvas width=500 height=500 id="canvas"></canvas>
+    <canvas width=1000 height=500 id="canvas"></canvas>
     <script src="../dist/canvasTools.min.js"></script>
     <script>
         // 获取绘图的上下文
@@ -17,18 +17,13 @@
 
         // 绘制矩形
         let canvasInstance = new CanvasTool(ctx);
-        canvasInstance.arc({
+        canvasInstance.roundRect({
             x: 100,
             y: 100,
-            r: 50,
-            sAngle: 90,
-            eAngle: 270,
-            counterclockwise: false,
-            fill: true,
-            bgColor: 'red',
-            strokeStyle: 'yellow',
-            strokeWidth: 4,
-            storke: true
+            width: 200,
+            height: 300,
+            r: 20,
+            bgColor: 'red'
         });
     </script>
 </body>

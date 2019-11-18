@@ -162,6 +162,59 @@
         }
 
         /**
+         * 绘制圆角矩形
+         * @param {number} x 圆角矩形选区的左上角 x坐标
+         * @param {number} y 圆角矩形选区的左上角 y坐标
+         * @param {number} w 圆角矩形选区的宽度
+         * @param {number} h 圆角矩形选区的高度
+         * @param {number} r 圆角的半径
+         * @memberof CanvasTool
+         */
+        roundRect(roundRectObj) {
+            let { x, y, width: w, height: h, r, bgColor } = roundRectObj;
+            // 参数校验规则
+            let ruleMap = new Map([
+                [x, { type: 'number', param: 'x' }],
+                [y, { type: 'number', param: 'y' }],
+                [w, { type: 'number', param: 'width' }],
+                [h, { type: 'number', param: 'height' }],
+                [r, { type: 'number', param: 'r' }],
+                [bgColor, { type: 'string', param: 'bgColor' }]
+            ]);
+            this[validateRlues](ruleMap);
+            // 开始绘制
+            this.ctx.beginPath();
+            this[setFillStyle](bgColor),
+                // 左上角
+                this.ctx.arc(x + r, y + r, r, Math.PI, Math.PI * 1.5);
+
+            // border-top
+            this.ctx.moveTo(x + r, y);
+            this.ctx.lineTo(x + w - r, y);
+            this.ctx.lineTo(x + w, y + r);
+            // 右上角
+            this.ctx.arc(x + w - r, y + r, r, Math.PI * 1.5, Math.PI * 2);
+
+            // border-right
+            this.ctx.lineTo(x + w, y + h - r);
+            this.ctx.lineTo(x + w - r, y + h);
+            // 右下角
+            this.ctx.arc(x + w - r, y + h - r, r, 0, Math.PI * 0.5);
+
+            // border-bottom
+            this.ctx.lineTo(x + r, y + h);
+            this.ctx.lineTo(x, y + h - r);
+            // 左下角
+            this.ctx.arc(x + r, y + h - r, r, Math.PI * 0.5, Math.PI);
+
+            // border-left
+            this.ctx.lineTo(x, y + r);
+            this.ctx.lineTo(x + r, y);
+
+            this.ctx.fill();
+        };
+
+        /**
          * square 绘制正方形的方法
          * @param { Object } squareObj 传入的圆形对象
          * 参数同矩形的参数一致,只需要传入width就可以了
@@ -222,6 +275,39 @@
                 this[setFillStyle](bgColor),
                 this.ctx.fill()
             );
+        }
+
+        /**
+         * 绘制圆形头像
+         * @param img 图片资源
+         * @param opts 参数
+         * @param beforeFn 函数钩子
+         * @param afterFn 函数钩子
+         */
+        circleAvatar(circleAvatarObj) {
+            let { img, opts, beforeFn, afterFn } = circleAvatarObj;
+            let { x, y, r } = opts;
+            // 参数校验规则
+            let ruleMap = new Map([
+                [x, { type: 'number', param: 'x' }],
+                [y, { type: 'number', param: 'y' }],
+                [r, { type: 'number', param: 'r' }]
+            ]);
+            this[validateRlues](ruleMap);
+
+            (isFunction(beforeFn)) && beforeFn();
+
+            this.drawCircle({
+                x,
+                y,
+                r
+            });
+            ctx.clip();
+            ctx.drawImage(img, x, y, r);
+            ctx.restore();
+
+            (isFunction(afterFn)) && afterFn();
+            return this;
         }
 
         /**

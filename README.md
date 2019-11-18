@@ -84,6 +84,17 @@ import CanvasTools from './canvasTools.mjs';
         strokeWidth: 4           // 边框宽度
     });
 
+画一个圆角矩形的方法.
+
+    canvasInstance.roundRect({
+        x: 100 , 
+        y: 100 , 
+        width: 200, 
+        height: 300, 
+        r: 50, // 圆角的大小 
+        bgColor: 'red';
+    })
+
 画一个圆的方法.
 
     canvasInstance.arc({         // arc画圆的方法
@@ -117,7 +128,7 @@ import CanvasTools from './canvasTools.mjs';
 
 更多的特性与API请查看源码.
 
-## Test
+## package
 
 ```bash
 $ npm install
