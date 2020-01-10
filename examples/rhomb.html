@@ -1,31 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 </head>
-
 <body>
-    <canvas width=1000 height=500 id="canvas"></canvas>
-    <script src="../dist/canvasTools.min.js"></script>
+    <canvas width=500 height=500 id="canvas"></canvas>
+    <!-- <script src="../dist/canvasTools.min.js"></script> -->
+    <script src="../src/canvasTools.js"></script>
     <script>
         // 获取绘图的上下文
         let ctx = document.querySelector("#canvas").getContext('2d');
 
         // 绘制圆角矩形
         let canvasInstance = new CanvasTool(ctx);
-        canvasInstance.roundRect({
-            x: 100,
-            y: 100,
-            width: 200,
-            height: 300,
-            r: 20,
+        canvasInstance.rhomb({
+            sx: 100,
+            sy: 100,
+            cx: 150,
+            cy: 150,
+            width: 100,
+            height: 100,
             bgColor: 'red'
         });
     </script>
 </body>
-
 </html>

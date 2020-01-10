@@ -28,6 +28,47 @@
         }
 
         /**
+         * 画菱形
+         * @param {Object} rhombObj 传入菱形的参数
+         * sx: 开始的x轴
+         * sy: 开始的y轴
+         * cx: 中心位置的x轴
+         * cy: 中心位置的y轴
+         * width: 宽度
+         * height: 高度
+         * bgColor: 背景色
+         */
+        rhomb(rhombObj) {
+            let { sx, sy, cx, cy, width, height, bgColor } = rhombObj;
+            // 参数校验规则
+            let ruleMap = new Map([
+                [sx, { type: 'number', param: 'sx' }],
+                [sy, { type: 'number', param: 'sy' }],
+                [cx, { type: 'number', param: 'cx' }],
+                [cy, { type: 'number', param: 'cy' }],
+                [width, { type: 'number', param: 'width' }],
+                [height, { type: 'number', param: 'height' }],
+                [bgColor, { type: 'string', param: 'bgColor' }]
+            ]);
+            this[validateRlues](ruleMap);
+
+            // 设置默认值
+            sx = sx || 0;
+            sy = sy || 0;
+            cx = cx || 0;
+            cy = cy || 0;
+            bgColor = bgColor || '#fff';
+
+            this.ctx.translate(cx, cy);
+            this.ctx.rotate(45 * Math.PI / 180);
+            // 修正画布坐标
+            this.ctx.translate(-cx, -cy);
+            this.ctx.fillStyle = bgColor;
+            this.ctx.fillRect(sx, sy, width, height);
+            this.ctx.save();
+        }
+
+        /**
          * 画直线
          * @param { Object } lineObj 传入的直线对象
          * line 画直线
@@ -373,7 +414,7 @@
         }
 
         /**
-         * 设置边框颜色
+         * 设置边框颜色 / 宽度
          */
         [setStrokeStyle](strokeWidth, strokeStyle) {
             this.ctx.lineWidth = strokeWidth;
@@ -381,7 +422,7 @@
         }
 
         /**
-         * 
+         * 设置字体大小
          */
         [setFontSize](fontSize, fontStyle = "Microsoft YaHei") {
             console.log(fontSize, fontStyle);
